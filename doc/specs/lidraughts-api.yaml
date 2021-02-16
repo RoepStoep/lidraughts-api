@@ -1291,6 +1291,81 @@ paths:
                 items:
                   $ref: '#/components/schemas/Simul'
 
+  /api/simul/{id}/games:
+    get:
+      operationId: gamesBySimul
+      summary: Export games of a simul
+      description: |
+        Download games of a simul in PDN or [ndjson](http://ndjson.org/) format.
+      tags:
+        - Simuls
+      security:
+        - None: []
+      parameters:
+        - in: path
+          name: id
+          description: The simul ID.
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: moves
+          description: Include the PDN moves.
+          schema:
+            type: boolean
+            default: true
+        - in: query
+          name: tags
+          description: Include the PDN tags.
+          schema:
+            type: boolean
+            default: true
+        - in: query
+          name: clocks
+          description: |
+            Include clock comments in the PDN moves, when available.
+
+            Example: `3. 16x27 {[%clock w0:01:59 B0:01:59]} 18-22 {[%clock W0:01:59 b0:01:58]}`
+          schema:
+            type: boolean
+            default: false
+        - in: query
+          name: evals
+          description: |
+            Include analysis evaluation comments in the PDN, when available.
+
+            Example: `7. 28x19 {[%eval 0.5]} 14x23 {[%eval 0.52]}`
+          schema:
+            type: boolean
+            default: false
+        - in: query
+          name: opening
+          description: |
+            Include the opening name.
+
+            Example: `[Opening "Chefneux Opening"]`
+          schema:
+            type: boolean
+            default: false
+        - in: query
+          name: algebraic
+          description: |
+            Use algebraic notation (a-h, 1-8) for the PDN moves of 64-variants (8x8 board).
+
+            Example: `1. c3-d4 f6-e5 2. d4xf6 g7xe5 3. a3-b4 h8-g7`
+          schema:
+            type: boolean
+            default: true
+      responses:
+        200:
+          content:
+            application/x-draughts-pdn:
+              schema:
+                $ref: '#/components/schemas/GamePdn'
+            application/x-ndjson:
+              schema:
+                $ref: '#/components/schemas/GameJson'
+
   /team/{teamId}/join:
     post:
       operationId: teamIdJoin
