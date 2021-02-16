@@ -480,6 +480,15 @@ paths:
           schema:
             type: boolean
             default: false
+        - in: query
+          name: algebraic
+          description: |
+            Use algebraic notation (a-h, 1-8) for the PDN moves of 64-variants (8x8 board).
+
+            Example: `1. c3-d4 f6-e5 2. d4xf6 g7xe5 3. a3-b4 h8-g7`
+          schema:
+            type: boolean
+            default: true
       responses:
         200:
           content:
@@ -631,6 +640,15 @@ paths:
           schema:
             type: boolean
             default: false
+        - in: query
+          name: algebraic
+          description: |
+            Use algebraic notation (a-h, 1-8) for the PDN moves of 64-variants (8x8 board).
+
+            Example: `1. c3-d4 f6-e5 2. d4xf6 g7xe5 3. a3-b4 h8-g7`
+          schema:
+            type: boolean
+            default: true
       responses:
         200:
           content:
@@ -707,6 +725,15 @@ paths:
           schema:
             type: boolean
             default: false
+        - in: query
+          name: algebraic
+          description: |
+            Use algebraic notation (a-h, 1-8) for the PDN moves of 64-variants (8x8 board).
+
+            Example: `1. c3-d4 f6-e5 2. d4xf6 g7xe5 3. a3-b4 h8-g7`
+          schema:
+            type: boolean
+            default: true
       responses:
         200:
           content:
@@ -1108,6 +1135,15 @@ paths:
           schema:
             type: boolean
             default: false
+        - in: query
+          name: algebraic
+          description: |
+            Use algebraic notation (a-h, 1-8) for the PDN moves of 64-variants (8x8 board).
+
+            Example: `1. c3-d4 f6-e5 2. d4xf6 g7xe5 3. a3-b4 h8-g7`
+          schema:
+            type: boolean
+            default: true
       responses:
         200:
           content:
