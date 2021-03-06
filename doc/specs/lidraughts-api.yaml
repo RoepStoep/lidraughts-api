@@ -1190,7 +1190,7 @@ paths:
               schema:
                 example: {"rank":4,"score":389,"rating":2618,"username":"george","title":"MI","performance":2423,"team":"coders"}
 
- /api/tournament/{id}/teams:
+  /api/tournament/{id}/teams:
     get:
       operationId: teamsByTournament
       summary: Get team standing of a team battle
