@@ -6,8 +6,7 @@ info:
     url: https://lidraughts.org/assets/piece/king-logo.svg
     backgroundColor: #ffffff
   description: "\n\n# Introduction\nWelcome to the reference for the Lidraughts API! Lidraughts is free/libre, open-source draughts server powered by volunteers and donations.\n\n\
-  \ - Get help in the [lidraughts developers discord channel](https://discord.gg/9CPhTJQEra),\
-  \ or in the #lidraughts IRC channel on freenode.\n\
+  \ - Get help in the [lidraughts developers discord channel](https://discord.gg/9CPhTJQEra).\n\
   \ - [Contribute to this documentation on Github](https://github.com/roepstoep/lidraughts-api).\n\
   \ - Check out [lidraughts widgets to embed in your website](https://lidraughts.org/developers).\n\
   \n## Endpoint\n\
