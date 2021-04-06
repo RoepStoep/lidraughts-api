@@ -1926,7 +1926,7 @@ paths:
                   description: Clock increment in seconds. If empty, a correspondence game is created.
                   example: 1
                   minimum: 0
-                  maximum: 60
+                  maximum: 180
                 days:
                   type: integer
                   description: Days per move, for correspondence games. Clock settings must be omitted.
@@ -1946,7 +1946,6 @@ paths:
                   description: The variant of the game
                   enum:
                     - standard
-                    - fromPosition
                     - frisian
                     - frysk
                     - antidraughts
@@ -1956,8 +1955,11 @@ paths:
                   default: standard
                 fen:
                   type: string
-                  description: Custom initial position (in FEN). Variant must be fromPosition, and the game cannot be rated.
-                  default: "W:W31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50:B1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20"
+                  description: Custom initial position (FEN). Variant must be standard, russian or brazilian. The game cannot be rated, unless it is a micro-match.
+                microMatch:
+                  type: boolean
+                  description: Makes this challenge a micro-match. A rematch with colors reversed will be played immediately after the first game is finished. Only possble when starting from a custom initial position.
+                  default: false
       responses:
         200:
           content:
@@ -2052,6 +2054,7 @@ components:
     ChallengeJson:
       example: {
         "id": "VU0nyvsW",
+        "url": "https://lidraughts.org/VU0nyvsW",
         "color": "random",
         "direction": "out",
         "timeControl": {
