@@ -1027,7 +1027,7 @@ paths:
                   description: |
                     Restrict entry to members of a team.
 
-                    The teamId is the last part of a team URL, e.g. https://lidraughts.org/team/coders has teamId = `coders`.
+                    The teamId is the last part of a team URL, e.g. https://lidraughts.org/team/lichess has teamId = `lichess`.
 
                     Leave empty to let everyone join the tournament.
 
@@ -1089,6 +1089,63 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArenaTournament'
+
+  /api/tournament/team-battle/{id}:
+      post:
+        operationId: apiTournamentTeamBattlePost
+        summary: Update a team battle
+        description: |
+          Set the teams and number of leaders of a team battle.
+          To update the other attributes of a team battle, use the [tournament update endpoint](#operation/apiTournamentUpdate).
+        tags:
+          - "Arena tournaments"
+        security:
+          - OAuth2: ["tournament:write"]
+        parameters:
+          - in: path
+            name: id
+            description: The tournament ID (8 characters)..
+            required: true
+            schema:
+              type: string
+        requestBody:
+          required: true
+          content:
+            application/x-www-form-urlencoded:
+              schema:
+                type: object
+                properties:
+                  teams:
+                    type: string
+                    description: |
+                      All team IDs of the team battle, separated by commas.
+                      Make sure to always send the full list.
+                      Teams that are not in the list will be removed from the team battle.
+                      Example: `lichess,professional-frisian-players,6Xh2zNLA`
+                  nbLeaders:
+                    type: integer
+                    description: Number team leaders per team.
+                required:
+                  - teams
+                  - nbLeaders
+        responses:
+          200:
+            description: The team battle tournament was successfully updated.
+            headers:
+              Access-Control-Allow-Origin:
+                schema:
+                  type: string
+                  default: "'*'"
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ArenaTournament'
+          400:
+            description: The update of the team battle tournament failed.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
 
   /api/tournament/{id}/games:
     get:
@@ -1201,7 +1258,7 @@ paths:
           content:
             application/x-ndjson:
               schema:
-                example: {"rank":4,"score":389,"rating":2618,"username":"george","title":"MI","performance":2423,"team":"coders"}
+                example: {"rank":4,"score":389,"rating":2618,"username":"george","title":"MI","performance":2423,"team":"lichess"}
 
   /api/tournament/{id}/teams:
     get:
@@ -1423,7 +1480,7 @@ paths:
           name: teamId
           schema:
             type: string
-            example: "coders"
+            example: "lichess"
           required: true
       responses:
         200:
@@ -1450,7 +1507,7 @@ paths:
           name: teamId
           schema:
             type: string
-            example: "coders"
+            example: "lichess"
           required: true
       responses:
         200:
@@ -1477,7 +1534,7 @@ paths:
           name: teamId
           schema:
             type: string
-            example: "coders"
+            example: "lichess"
           required: true
         - in: path
           name: userId
@@ -1509,7 +1566,7 @@ paths:
           name: teamId
           schema:
             type: string
-            example: "coders"
+            example: "lichess"
           required: true
       requestBody:
         required: true
