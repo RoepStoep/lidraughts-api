@@ -1985,7 +1985,7 @@ paths:
               properties:
                 rated:
                   type: boolean
-                  description: Game is rated and impacts players ratings
+                  description: Game is rated and impacts players ratings.
                 'clock.limit':
                   type: number
                   description: Clock initial time in seconds. If empty, a correspondence game is created.
@@ -2103,6 +2103,106 @@ paths:
               schema:
                 $ref: '#/components/schemas/NotFound'
 
+  /api/challenge/external/{username}:
+    post:
+      operationId: challengeExternal
+      summary: Create an external challenge
+      description: |
+        Create a challenge between any two players. The targeted players get the choice to join when they visit the challenge url. If both players have joined the game starts.
+        
+        Optionally a starting date/time can be specified. The challenge page shows a countdown until the specified date/time is reached. Only then do the players get the option to join.
+
+        Players don't get notified when you create an external challenge for them. The only way to find the challenge after it is created is by visiting the url that is returned in the Json.
+      tags:
+        - Challenges
+      security:
+        - None: []
+      parameters:
+        - in: path
+          name: username
+          schema:
+            type: string
+            example: "george"
+          required: true
+      requestBody:
+        description: Parameters of the challenge
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                opponent:
+                  type: string
+                  required: true
+                  description: Username of the second player.
+                rated:
+                  type: boolean
+                  description: Game is rated and impacts players ratings.
+                'clock.limit':
+                  type: number
+                  description: Clock initial time in seconds. If empty, a correspondence game is created.
+                  example: 300
+                  minimum: 0
+                  maximum: 10800
+                'clock.increment':
+                  type: integer
+                  description: Clock increment in seconds. If empty, a correspondence game is created.
+                  example: 1
+                  minimum: 0
+                  maximum: 180
+                days:
+                  type: integer
+                  description: Days per move, for correspondence games. Clock settings must be omitted.
+                  example: 5
+                  minimum: 1
+                  maximum: 14
+                color:
+                  type: string
+                  description: Which color the user specified in the url gets to play.
+                  enum:
+                    - random
+                    - white
+                    - black
+                  default: 'random'
+                variant:
+                  type: string
+                  description: The variant of the game
+                  enum:
+                    - standard
+                    - frisian
+                    - frysk
+                    - antidraughts
+                    - breakthrough
+                    - russian
+                    - brazilian
+                  default: standard
+                fen:
+                  type: string
+                  description: Custom initial position (FEN). Both algebraic coordinates and fieldnumbers are supported. Variant must be standard, russian or brazilian. The game cannot be rated, unless it is a micro-match.
+                microMatch:
+                  type: boolean
+                  description: Makes this challenge a micro-match. A rematch with colors reversed will be played immediately after the first game is finished. Only possble when starting from a custom initial position.
+                  default: false
+                startsAt:
+                  type: integer
+                  description: |
+                    Optional. Timestamp in milliseconds when the challenge becomes available to join.
+
+                    Example: `1617274800000`
+                  example: 1617274800000
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalChallengeJson'
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 
 components:
   parameters:
@@ -2162,6 +2262,46 @@ components:
         "rated": true,
         "speed": "blitz",
         "status": "created"
+      }
+
+    ExternalChallengeJson:
+      example: {
+        "id": "5v3Omry5",
+        "url": "https://lidraughts.org/5v3Omry5",
+        "status": "external",
+        "challenger": {
+          "id": "bumperballooncars",
+          "name": "BumperBalloonCars",
+          "title": null,
+          "rating": 2008,
+          "patron": true
+        },
+        "destUser": {
+          "id": "george",
+          "name": "George",
+          "title": null,
+          "rating": 1633
+        },
+        "variant": {
+          "key": "standard",
+          "name": "Standard",
+          "short": "Std"
+        },
+        "rated": true,
+        "speed": "bullet",
+        "timeControl": {
+          "type": "clock",
+          "limit": 60,
+          "increment": 0,
+          "show": "1+0"
+        },
+        "color": "random",
+        "perf": {
+          "icon": "T",
+          "name": "Bullet"
+        },
+        "external": true,
+        "startsAt": 1619434800000
       }
 
     BulkPairing:
