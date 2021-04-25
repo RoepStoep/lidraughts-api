@@ -42,6 +42,9 @@ tags:
 - name: Challenges
   description: |
     Send and receive challenges to play.
+- name: External tournaments
+  description: |
+    Create tournaments on Lidraughts that are externally managed. Lidraughts generates a tournament lobby with upcoming / ongoing games, results and standings. You have full control over the participants and pairings through the API.
 - name: Arena tournaments
   description: |
     Access Arena tournaments played on Lidraughts.
@@ -999,7 +1002,7 @@ paths:
                   default: true
                 description:
                   type: string
-                  description: Anything you want to tell players about the tournament
+                  description: Anything you want to tell players about the tournament. Markdown links are available.
                 password:
                   type: string
                   description: Make the tournament private, and restrict access with a password
@@ -1240,6 +1243,272 @@ paths:
             application/x-ndjson:
               schema:
                 $ref: '#/components/schemas/ArenaTournament'
+
+  /api/tournament/external:
+    post:
+      operationId: apiExternalTournamentCreate
+      summary: Create a new external tournament
+      description: |
+        Create a new external tournament.
+
+        By default the players are visible in the tournament lobby with their lidraughts username, rating and title.
+        When `userDisplay` is set to `fmjd`, these are replaced with the values from the FMJD database (full name, FMJD rating, FMJD title) where available.
+        The FMJD data is taken from the most recently published rating list as on [fmjd.org/?p=rating](https://www.fmjd.org/?p=rating)
+      tags:
+        - "External tournaments"
+      security:
+        - OAuth2: ["tourext:write"]
+      requestBody:
+        description: Parameters of the tournament
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The tournament name.
+                description:
+                  type: string
+                  description: Anything you want to tell players about the tournament. Markdown links are available.
+                variant:
+                  type: string
+                  description: The variant of the games
+                  enum:
+                    - standard
+                    - frisian
+                    - frysk
+                    - antidraughts
+                    - breakthrough
+                    - russian
+                    - brazilian
+                  default: standard
+                rated:
+                  type: boolean
+                  description: Games are rated and impacts players ratings
+                'clock.limit':
+                  type: number
+                  description: Clock initial time in seconds. If empty, correspondence games are created.
+                  example: 300
+                  minimum: 0
+                  maximum: 10800
+                'clock.increment':
+                  type: integer
+                  description: Clock increment in seconds. If empty, correspondence games are created.
+                  example: 1
+                  minimum: 0
+                  maximum: 180
+                days:
+                  type: integer
+                  description: Days per move, for correspondence games. Clock settings must be omitted.
+                  example: 5
+                  minimum: 1
+                  maximum: 14
+                microMatches:
+                  type: boolean
+                  description: Makes each round a micro-match. A rematch with colors reversed will be played immediately after the first game is finished.
+                  default: false
+                startsAt:
+                  type: string
+                  description: UTC date/time of tournament start, in format YYYY-MM-DD HH:mm. Displays a countdown in the tournament lobby. This is purely for visual purpose, i.e. nothing happens when the countdown reaches zero.
+                  example: 2021-04-01 16:33
+                hasChat:
+                  type: boolean
+                  description: Display a chatbox in the tournament lobby. Note that the tournament creator can timeout users in the chat.
+                  default: true
+                autoStartGames:
+                  type: boolean
+                  description: Whether the tournament games start automatically. If set to false, both players have to click 'Join' on the game page before the clocks start.
+                  default: false
+                rounds:
+                  type: integer
+                  description: Optional. Sets the amount of rounds in the tournament. If empty, the tournament doesn't show rounds.
+                  example: 12
+                  minimum: 1
+                  maximum: 100
+                userDisplay:
+                  type: string
+                  description: Primary display of usernames in the tournament lobby.
+                  enum:
+                    - lidraughts
+                    - fmjd
+                  default: lidraughts
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalTournamentMinimal'
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/tournament/external/{id}:
+    get:
+      operationId: apiExternalTournament
+      summary: Get info about an external tournament
+      description: |
+        Get detailed tournament info, including players and upcoming games. Only allowed for tournaments created by you.
+      tags:
+        - "External tournaments"
+      security:
+        - OAuth2: ["tourext:write"]
+      parameters:
+        - in: path
+          name: id
+          description: The tournament ID.
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalTournament'
+    post:
+      operationId: apiExternalTournamentUpdate
+      summary: Update an external tournament
+      description: |
+        Update an external tournament.
+
+        Once games have been added to the tournament, the game settings can no longer be changed: `variant`, `clock`, `days`, `rated`, `microMatches`, `autoStartGames`
+      tags:
+        - "External tournaments"
+      security:
+        - OAuth2: ["tourext:write"]
+      requestBody:
+        description: Parameters of the tournament
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The tournament name.
+                description:
+                  type: string
+                  description: Anything you want to tell players about the tournament. Markdown links are available.
+                variant:
+                  type: string
+                  description: The variant of the games
+                  enum:
+                    - standard
+                    - frisian
+                    - frysk
+                    - antidraughts
+                    - breakthrough
+                    - russian
+                    - brazilian
+                  default: standard
+                rated:
+                  type: boolean
+                  description: Games are rated and impacts players ratings
+                'clock.limit':
+                  type: number
+                  description: Clock initial time in seconds. If empty, correspondence games are created.
+                  example: 300
+                  minimum: 0
+                  maximum: 10800
+                'clock.increment':
+                  type: integer
+                  description: Clock increment in seconds. If empty, correspondence games are created.
+                  example: 1
+                  minimum: 0
+                  maximum: 180
+                days:
+                  type: integer
+                  description: Days per move, for correspondence games. Clock settings must be omitted.
+                  example: 5
+                  minimum: 1
+                  maximum: 14
+                microMatches:
+                  type: boolean
+                  description: Makes each round a micro-match. A rematch with colors reversed will be played immediately after the first game is finished.
+                  default: false
+                startsAt:
+                  type: string
+                  description: UTC date/time of tournament start, in format YYYY-MM-DD HH:mm. Displays a countdown in the tournament lobby. This is purely for visual purpose, i.e. nothing happens when the countdown reaches zero.
+                  example: 2021-04-01 16:33
+                hasChat:
+                  type: boolean
+                  description: Display a chatbox in the tournament lobby. Note that the tournament creator can timeout users in the chat.
+                  default: true
+                autoStartGames:
+                  type: boolean
+                  description: Whether the tournament games start automatically. If set to false, both players have to click 'Join' on the game page before the clocks start.
+                  default: false
+                rounds:
+                  type: integer
+                  description: Optional. Sets the amount of rounds in the tournament. If empty, the tournament doesn't show rounds.
+                  example: 12
+                  minimum: 1
+                  maximum: 100
+                userDisplay:
+                  type: string
+                  description: Primary display of usernames in the tournament lobby. If set to `fmjd` the 
+                  enum:
+                    - lidraughts
+                    - fmjd
+                  default: lidraughts
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalTournamentMinimal'
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/tournament/external/{id}/player:
+    post:
+      operationId: apiExternalTournamentPlayer
+      summary: Add a player to the tournament
+      description: |
+        Invite a user to play in your tournament. Only invite users if you know they want to participate. Users don't receive a notification when invited.
+
+        If an FMJD ID is specified, there will be an extra section in the player details in the tournament lobby, that shows the public [FMJD profile](https://www.fmjd.org/?p=pcard&id=10122) information such as photo, full name, rating, etc.
+        When the tournament has `userDisplay` set to `fmjd`, the same information will be visible in the tournament lobby instead of the Lidraughts username, rating and title.
+
+        When an invited player opens the tournament lobby, they will see a prompt that asks if they agree to participate. It contains an explanation of the tournament rules, and their FMJD ID if you specified one.
+      tags:
+        - "External tournaments"
+      security:
+        - OAuth2: ["tourext:write"]
+      requestBody:
+        description: Parameters of the tournament
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  description: The Lidraughts userId of the player.
+                  required: true
+                fmjdId:
+                  type: string
+                  description: Optional. Only add if it makes sense in the context of your tournament.
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalTournamentPlayer'
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /study/{studyId}/{chapterId}.pdn:
     get:
@@ -1932,7 +2201,7 @@ paths:
                   description: Days per move, for correspondence games. Clock settings must be omitted.
                   example: 5
                   minimum: 1
-                  maximum: 15
+                  maximum: 14
                 color:
                   type: string
                   description: Which color you get to play
@@ -2986,6 +3255,75 @@ components:
         }
       }
 
+    ExternalTournament:
+      example: {
+        "id":"uCU1IPCb",
+        "createdBy":"roepstoep",
+        "name": "Test Tournament",
+        "variant": "brazilian",
+        "rated": true,
+        "userDisplay": "lidraughts",
+        "hasChat": true,
+        "autoStartGames": true,
+        "microMatches": true,
+        "clock": { "limit": 60, "increment": 1},
+        "rounds": 14,
+        "description": "A useless tournament for demonstration purposes.\n\nIt is possible to include [links](https://lidraughts.org)!",
+        "players": [
+          {
+            "userId": "george",
+            "status": "accepted",
+            "fmjdId": "00001"
+          },
+          {
+            "userId": "baker",
+            "status": "accepted",
+            "fmjdId": "00002"
+          },
+          {
+            "userId": "roepstoep",
+            "status": "rejected"
+          },
+          {
+            "userId": "player1",
+            "status": "invited",
+            "fmjdId": "00003"
+          }
+        ],
+        "upcoming": [
+          {
+            "id": "ylWuh5lo",
+            "white": "george",
+            "black": "baker",
+            "startsAt": "2021-04-25T13:00:00.000+02:00",
+            "round": 1
+          }
+        ]
+      }
+
+    ExternalTournamentMinimal:
+      example: {
+        "id": "uCU1IPCb",
+        "createdBy": "roepstoep",
+        "name": "Test Tournament",
+        "variant": "brazilian",
+        "rated": true,
+        "userDisplay": "lidraughts",
+        "hasChat": true,
+        "autoStartGames": true,
+        "microMatches": true,
+        "clock": { "limit": 60, "increment": 1},
+        "rounds": 14,
+        "description": "A useless tournament for demonstration purposes.\n\nIt is possible to include [links](https://lidraughts.org)!"
+      }
+
+    ExternalTournamentPlayer:
+      example: {
+        "userId": "charles",
+        "status": "invited",
+        "fmjdId": "00001"
+      }
+
     SwissTournament:
       example: {
         "rated": true,
@@ -2993,7 +3331,7 @@ components:
             "increment": 0,
             "limit": 300
         },
-        "createdBy": "thibault",
+        "createdBy": "roepstoep",
         "greatPlayer": {
             "name": "Wang",
             "url": "https://wikipedia.org/wiki/Wang_Hao_(chess_player)"
@@ -3241,6 +3579,7 @@ components:
             "challenge:read": Read incoming challenges
             "challenge:write": Create, accept, decline challenges
             "tournament:write": Create tournaments
+            "tourext:write": Manage external tournaments
             "puzzle:read": Read puzzle activity
             "team:write": Join, leave, and manage teams
             "bot:play": Play with the Bot API. Only for [Bot accounts](#operation/botAccountUpgrade)
