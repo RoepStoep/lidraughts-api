@@ -992,7 +992,11 @@ paths:
                     - 60
                 startDate:
                   type: integer
-                  description: Timestamp to start the tournament at a given date and time. Overrides the `waitMinutes` setting.
+                  description: |
+                    Timestamp in milliseconds to start the tournament at a given date and time. Overrides the `waitMinutes` setting.
+
+                    Example: `1617274800000`
+                  Example: 1617274800000
                 variant:
                   type: string
                   description: The variant to use in tournament games
@@ -1383,9 +1387,12 @@ paths:
                   description: Makes each round a micro-match. A rematch with colors reversed will be played immediately after the first game is finished.
                   default: false
                 startsAt:
-                  type: string
-                  description: UTC date/time of tournament start, in format YYYY-MM-DD HH:mm. Displays a countdown in the tournament lobby. This is purely for visual purpose, i.e. nothing happens when the countdown reaches zero. Best set to the time the first games start.
-                  example: "2021-04-01 16:33"
+                  type: integer
+                  description: |
+                    Optional. Timestamp in milliseconds when the tournament start. Displays a countdown in the tournament lobby, purely for visual purpose (i.e. nothing happens when the countdown reaches zero). Best set to the time the first game starts.
+
+                    Example: `1617274800000`
+                  example: 1617274800000
                 hasChat:
                   type: boolean
                   description: Display a chatbox in the tournament lobby. Note that the tournament creator can timeout users that misbehave in the chat.
@@ -1512,9 +1519,12 @@ paths:
                   description: Makes each round a micro-match. A rematch with colors reversed will be played immediately after the first game is finished.
                   default: false
                 startsAt:
-                  type: string
-                  description: UTC date/time of tournament start, in format YYYY-MM-DD HH:mm. Displays a countdown in the tournament lobby. This is purely for visual purpose, i.e. nothing happens when the countdown reaches zero. Best set to the time the first games start.
-                  example: 2021-04-01 16:33
+                  type: integer
+                  description: |
+                    Optional. Timestamp in milliseconds when the tournament start. Displays a countdown in the tournament lobby, purely for visual purpose (i.e. nothing happens when the countdown reaches zero). Best set to the time the first game starts.
+
+                    Example: `1617274800000`
+                  example: 1617274800000
                 hasChat:
                   type: boolean
                   description: Display a chatbox in the tournament lobby. Note that the tournament creator can timeout users that misbehave in the chat.
@@ -1713,17 +1723,20 @@ paths:
               properties:
                 whiteUserId:
                   type: string
-                  description: The userId of the white player.
                   required: true
+                  description: The userId of the white player.
                 blackUserId:
                   type: string
+                  required: true
                   description: The userId of the black player.
-                  required: true
                 startsAt:
-                  type: string
-                  required: true
-                  description: The UTC date/time when the game starts.
-                  example: "2021-04-01 16:30"
+                  type: integer
+                  retuired: true
+                  description: |
+                    Timestamp in milliseconds when the game starts.
+
+                    Example: `1617274800000` 
+                  example: 1617274800000
                 round:
                   type: integer
                   description: The round number of this game. Required when the tournament has rounds.
@@ -3600,7 +3613,7 @@ components:
         "id": "ylWuh5lo",
         "whiteUserId": "george",
         "blackUserId": "baker",
-        "startsAt": "2021-04-25T13:00:00.000+02:00",
+        "startsAt": 1619434800000,
         "round": 1
       }
 
