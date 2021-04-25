@@ -882,7 +882,7 @@ paths:
               properties:
                 name:
                   type: string
-                  description: The tournament name. Leave empty to get a random Grandmaster name
+                  description: The tournament name. Leave empty to get a random Grandmaster name.
                 clockTime:
                   type: number
                   description: Clock initial time in minutes
@@ -986,7 +986,7 @@ paths:
                     - 60
                 startDate:
                   type: integer
-                  description: Timestamp to start the tournament at a given date and time. Overrides the `waitMinutes` setting
+                  description: Timestamp to start the tournament at a given date and time. Overrides the `waitMinutes` setting.
                 variant:
                   type: string
                   description: The variant to use in tournament games
@@ -1013,11 +1013,11 @@ paths:
                   default: true
                 description:
                   type: string
-                  description: Anything you want to tell players about the tournament
+                  description: Anything you want to tell players about the tournament. Markdown links are available.
                 password:
                   type: string
                   description: Make the tournament private, and restrict access with a password
-                teambBattleByTeam:
+                teamBattleByTeam:
                   type: string
                   description: |
                     Set the ID of a team you lead to create a team battle.
@@ -1946,7 +1946,7 @@ paths:
                   description: Days per move, for correspondence games. Clock settings must be omitted.
                   example: 5
                   minimum: 1
-                  maximum: 15
+                  maximum: 14
                 color:
                   type: string
                   description: Which color you get to play
@@ -1969,7 +1969,7 @@ paths:
                   default: standard
                 fen:
                   type: string
-                  description: Custom initial position (FEN). Variant must be standard, russian or brazilian. The game cannot be rated, unless it is a micro-match.
+                  description: Custom initial position (FEN). Both algebraic coordinates and fieldnumbers are supported. Variant must be standard, russian or brazilian. The game cannot be rated, unless it is a micro-match.
                 microMatch:
                   type: boolean
                   description: Makes this challenge a micro-match. A rematch with colors reversed will be played immediately after the first game is finished. Only possble when starting from a custom initial position.
