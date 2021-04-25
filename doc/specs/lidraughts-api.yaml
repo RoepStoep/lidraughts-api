@@ -39,6 +39,20 @@ tags:
   description: |
     Access and manage Lidraughts teams and their members.
     https://lidraughts.org/team
+- name: Bot
+  description: "Play on Lidraughts as a bot. Allows engine play.\n
+  \ Only works with [Bot accounts](#operation/botAccountUpgrade).\n\n\
+  \n### Features\n\
+  \ - [Stream incoming draughts moves](#operation/botGameStream)\n\
+  \ - [Play draughts moves](#operation/botGameMove)\n\
+  \ - [Read](#operation/botGameStream) and [write](#operation/botGameChat) in the player and spectator chats\n\
+  \ - [Receive](#operation/apiStreamEvent), [create](#operation/challengeCreate) and [accept](#operation/challengeAccept) (or [decline](#operation/challengeDecline)) challenges\n\
+  \ - [Abort](#operation/botGameAbort) and [resign](#operation/botGameResign) games\n\
+  \ - Engine assistance is allowed\n\
+  \n### Restrictions\n\
+  \ - Bots can only play challenge games: lobby and tournaments are off-limits\n\
+  \n### Integrations\n\
+  \ None as of yet. Let us know if you have made a working bot client!"
 - name: Challenges
   description: |
     Send and receive challenges to play.
