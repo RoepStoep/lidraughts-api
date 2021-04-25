@@ -42,12 +42,6 @@ tags:
 - name: Challenges
   description: |
     Send and receive challenges to play.
-- name: External tournaments
-  description: |
-    Create tournaments on Lidraughts that are externally managed. Lidraughts generates a tournament lobby with upcoming / ongoing games, results and standings. You have full control over the participants and pairings through the API.
-
-    An optional feature is to display FMJD data of the players (photo, real name, rating, title, etc) in the tournament lobby. This data is taken from the most recently published rating list as on [fmjd.org/?p=rating](https://www.fmjd.org/?p=rating).
-    Only use this feature when it makes sense in the context of your tournament, and when you are sure the Lidraughts account matches the FMJD ID!
 - name: Arena tournaments
   description: |
     Access Arena tournaments played on Lidraughts.
@@ -61,6 +55,12 @@ tags:
   description: |
     Access Lidraughts studies.
     https://lidraughts.org/study
+- name: External tournaments
+  description: |
+    Create tournaments on Lidraughts that are managed externally through the API. Lidraughts generates a tournament lobby with upcoming / ongoing games, results and standings. You have full control over the participants, pairings, and other tournament settings.
+
+    An optional feature is to display FMJD data of the players (photo, real name, rating, title, etc) in the tournament lobby. This data is taken from the most recently published rating list as on [fmjd.org/?p=rating](https://www.fmjd.org/?p=rating).
+    Only use this feature when it makes sense in the context of your tournament, and when you are sure each Lidraughts account matches the FMJD ID!
 - name: OAuth
   description: |
     Requests taking advantage of OAuth authentication.
