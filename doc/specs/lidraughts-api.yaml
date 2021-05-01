@@ -1393,10 +1393,14 @@ paths:
 
                     Example: `1617274800000`
                   example: 1617274800000
-                hasChat:
-                  type: boolean
-                  description: Display a chatbox in the tournament lobby. Note that the tournament creator can timeout users that misbehave in the chat.
-                  default: true
+                chat:
+                  type: string
+                  description: Who can see the chatbox in the tournament lobby. Note that the tournament creator can timeout users that misbehave in the chat.
+                  enum:
+                    - everyone
+                    - players
+                    - nobody
+                  default: everyone
                 autoStartGames:
                   type: boolean
                   description: Set to true to start the tournament games automatically. If set to false, both players have to click 'Join' on the game page before the clocks start. Also see the explanation of the [game create endpoint](#operation/apiExternalTournamentGameCreate).
@@ -1525,10 +1529,14 @@ paths:
 
                     Example: `1617274800000`
                   example: 1617274800000
-                hasChat:
-                  type: boolean
-                  description: Display a chatbox in the tournament lobby. Note that the tournament creator can timeout users that misbehave in the chat.
-                  default: true
+                chat:
+                  type: string
+                  description: Who can see the chatbox in the tournament lobby. Note that the tournament creator can timeout users that misbehave in the chat.
+                  enum:
+                    - everyone
+                    - players
+                    - nobody
+                  default: everyone
                 autoStartGames:
                   type: boolean
                   description: Set to true to start the tournament games automatically. If set to false, both players have to click 'Join' on the game page before the clocks start. Also see the explanation of the [game create endpoint](#operation/apiExternalTournamentGameCreate).
@@ -3687,7 +3695,7 @@ components:
         "variant": "brazilian",
         "rated": true,
         "userDisplay": "lidraughts",
-        "hasChat": true,
+        "chat": "everyone",
         "autoStartGames": true,
         "microMatches": true,
         "clock": { "limit": 60, "increment": 1},
@@ -3733,7 +3741,7 @@ components:
         "variant": "brazilian",
         "rated": true,
         "userDisplay": "lidraughts",
-        "hasChat": true,
+        "chat": "everyone",
         "autoStartGames": true,
         "microMatches": true,
         "clock": { "limit": 60, "increment": 1},
