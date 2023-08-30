@@ -1460,15 +1460,170 @@ paths:
               schema:
                 $ref: '#/components/schemas/GameJson'
 
+  /api/team/{teamId}:
+    get:
+      operationId: teamShow
+      summary: Get a single team
+      description: Infos about a team
+      tags:
+        - Teams
+      security: []
+      parameters:
+        - in: path
+          name: teamId
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: The information about the team.
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                default: "'*'"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+
+  /api/team/all:
+    get:
+      operationId: teamAll
+      summary: Get popular teams
+      description: |
+        Paginator of the most popular teams.
+      tags:
+        - Teams
+      security: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: number
+            example: 1
+            default: 1
+      responses:
+        "200":
+          description: A paginated list of the most popular teams.
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                default: "'*'"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamPaginatorJson'
+
+  /api/team/of/{username}:
+    get:
+      operationId: teamOfUsername
+      summary: Teams of a player
+      description: |
+        All the teams a player is a member of.
+      tags:
+        - Teams
+      security: []
+      parameters:
+        - in: path
+          name: username
+          schema:
+            type: string
+            example: "roepstoep"
+          required: true
+      responses:
+        "200":
+          description: The list of teams the user is a member of.
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                default: "'*'"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Team'
+
+  /api/team/search:
+    get:
+      operationId: teamSearch
+      summary: Search teams
+      description: |
+        Paginator of team search results for a keyword.
+      tags:
+        - Teams
+      security: []
+      parameters:
+        - in: query
+          name: text
+          schema:
+            type: string
+            example: coders
+        - in: query
+          name: page
+          schema:
+            type: number
+            example: 1
+            default: 1
+      responses:
+        "200":
+          description: The paginated list of teams.
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                default: "'*'"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamPaginatorJson'
+
+  /api/team/{teamId}/users:
+    get:
+      operationId: teamIdUsers
+      summary: Get members of a team
+      description: |
+        Members are sorted by reverse chronological order of joining the team (most recent first).
+        OAuth is only required if the list of members is private.
+
+        Members are streamed as [ndjson](#section/Introduction/Streaming-with-ND-JSON).
+      tags:
+        - Users
+        - Teams
+      security:
+        - OAuth2: ["team:read"]
+      parameters:
+        - in: path
+          name: teamId
+          schema:
+            type: string
+            example: "coders"
+          required: true
+      responses:
+        "200":
+          description: The list of users in the team.
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                default: "'*'"
+          content:
+            application/x-ndjson:
+              schema:
+                $ref: '#/components/schemas/UserExtended'
+
   /team/{teamId}/join:
     post:
       operationId: teamIdJoin
       summary: Join a team
       description: |
         Join a team.
-        If the team join policy requires a confirmation,
-        and the team owner is not the oAuth app owner,
-        then the call fails with `403 Forbidden`.
+        If the team join policy requires a confirmation but the
+        `message` parameter is not given, then the call fails with
+        `403 Forbidden`.
       tags:
         - Teams
         - OAuth
@@ -1482,6 +1637,16 @@ paths:
             type: string
             example: "lichess"
           required: true
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  description: Optional request message, if the team requires one.
       responses:
         200:
           content:
@@ -3048,6 +3213,53 @@ components:
             - standard
             - frisian
             - russian
+
+    Team:
+      type: object
+      properties:
+        id:
+          type: string
+          example: coders
+        name:
+          type: string
+          example: Coders
+        description:
+          type: string
+          example: "There are 10 kinds of people in the world: those who understand binary, and the others.\r\n\r\nIf you want to join the team, prove (briefly) that you can code in the request message!"
+        open:
+          type: boolean
+          example: false
+        leader:
+          $ref: '#/components/schemas/LightUser'
+        nbMembers:
+          type: integer
+          example: 3129
+
+    TeamPaginatorJson:
+      type: object
+      properties:
+        currentPage:
+          type: number
+          example: 4
+        maxPerPage:
+          type: number
+          example: 15
+        currentPageResults:
+          type: array
+          items:
+            $ref: '#/components/schemas/Team'
+        nbResults:
+          type: number
+          example: 205194
+        previousPage:
+          type: [number, 'null']
+          example: 3
+        nextPage:
+          type: [number, 'null']
+          example: 5
+        nbPages:
+          type: number
+          example: 13680
 
     ArenaTournaments:
       type: object
