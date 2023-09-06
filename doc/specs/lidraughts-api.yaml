@@ -1,22 +1,45 @@
-openapi: "3.0.0"
+openapi: "3.1.0"
 info:
   version: 1.0.0
   title: Lidraughts.org API reference
+  contact:
+    name: "Lidraughts.org API"
+    url: "https://lidraughts.org/api"
+    email: "contact@lidraughts.org"
   x-logo:
     url: https://lidraughts.org/assets/piece/king-logo.svg
     backgroundColor: #ffffff
-  description: "\n\n# Introduction\nWelcome to the reference for the Lidraughts API! Lidraughts is free/libre, open-source draughts server powered by volunteers and donations.\n\n\
-  \ - Get help by email at [contact@lidraughts.org](mailto:contact@lidraughts.org).\n\
-  \ - [Contribute to this documentation on Github](https://github.com/roepstoep/lidraughts-api).\n\
-  \ - Check out [lidraughts widgets to embed in your website](https://lidraughts.org/developers).\n\
-  \n## Endpoint\n\
-  \ All requests go to `https://lidraughts.org`.\n\
-  \n## Rate limiting\n\
-  \ All requests are rate limited using various strategies,\
-  \ to ensure the API remains responsive for everyone.\n\
-  \ Only make one request at a time.\n\
-  \ If you receive an HTTP response with a [429 status](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#429),\
-  \ please wait a full minute before resuming API usage."
+  license:
+    name: AGPL-3.0-or-later
+    url: https://www.gnu.org/licenses/agpl-3.0.txt
+  description: |
+    # Introduction
+    Welcome to the reference for the Lidraughts API! Lidraughts is a free/libre,
+    open-source draughts server powered by volunteers and donations.
+    - Get help by email at [contact@lidraughts.org](mailto:contact@lidraughts.org).
+    - [Contribute to this documentation on Github](https://github.com/roepstoep/lidraughts-api).
+    - Check out [lidraughts widgets to embed in your website](https://lidraughts.org/developers).
+
+    ## Endpoint
+    All requests go to `https://lidraughts.org` (unless otherwise specified).
+
+    ## Rate limiting
+    All requests are rate limited using various strategies,
+    to ensure the API remains responsive for everyone.
+    Only make one request at a time.
+    If you receive an HTTP response with a [429 status](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#429),
+    please wait a full minute before resuming API usage.
+
+    ## Streaming with ND-JSON
+    Some API endpoints stream their responses as [Newline Delimited JSON a.k.a. **nd-json**](http://ndjson.org/), with one JSON object per line.
+
+    Here's a [JavaScript utility function](https://gist.github.com/ornicar/a097406810939cf7be1df8ea30e94f3e) to help reading NDJSON streamed responses.
+
+    ## Authentication
+    ### Personal Access Token
+    Personal API access tokens allow you to quickly interact with Lidraughts API without going through an OAuth flow.
+    - [Generate a personal access token](https://lidraughts.org/account/oauth/token)
+    - `curl https://lidraughts.org/api/account -H "Authorization: Bearer {token}"`
 servers:
   - url: https://lidraughts.org
 tags:
@@ -517,7 +540,7 @@ paths:
       operationId: apiGamesUser
       summary: Export games of a user
       description: |
-        Download all games of any user in PDN or [ndjson](http://ndjson.org/) format.
+        Download all games of any user in PDN or [ndjson](#section/Introduction/Streaming-with-ND-JSON) format.
 
         Games are sorted by reverse chronological order (most recent first)
 
@@ -677,7 +700,7 @@ paths:
       operationId: gamesExportIds
       summary: Export games by IDs
       description: |
-        Download games by IDs in PDN or [ndjson](http://ndjson.org/) format.
+        Download games by IDs in PDN or [ndjson](#section/Introduction/Streaming-with-ND-JSON) format, depending on the request Accept header.
 
         Games are sorted by reverse chronological order (most recent first)
 
@@ -760,14 +783,14 @@ paths:
   /api/stream/games-by-users:
     post:
       operationId: gamesByUsers
-      summary: Stream current games
+      summary: Stream games of users
       description: |
         Stream the games played between a list of users, in real time.
         Only games where **both players** are part of the list are included.
 
-        Maximum number of users: 300.
+        Games are streamed as [ndjson](#section/Introduction/Streaming-with-ND-JSON).
 
-        **Games are streamed as [ndjson](http://ndjson.org/)**, i.e. one JSON object per line.
+        Maximum number of users: 300.
 
         The method is `POST` so a longer list of IDs can be sent in the request body.
       tags:
@@ -775,13 +798,14 @@ paths:
       security:
         - None: []
       requestBody:
-        description: Up to 300 user IDs separated by commas.
+        description: |
+          Up to 300 user IDs separated by commas.
+          Example: `george,player1,player2`
         required: true
         content:
           text/plain:
             schema:
               type: string
-            example: george,plyer2,player3
       responses:
         200:
           content:
@@ -823,7 +847,7 @@ paths:
       operationId: tvFeed
       summary: Stream current TV game
       description: |
-        Stream positions and moves of the current [TV game](https://lidraughts.org/tv) in [ndjson](http://ndjson.org/).
+        Stream positions and moves of the current [TV game](https://lidraughts.org/tv) in [ndjson](#section/Introduction/Streaming-with-ND-JSON) format.
         A summary of the game is sent as a first message, and when the featured game changes.
 
         Try it with `curl https://lidraughts.org/tv/feed`.
@@ -1323,7 +1347,7 @@ paths:
                     All team IDs of the team battle, separated by commas.
                     Make sure to always send the full list.
                     Teams that are not in the list will be removed from the team battle.
-                    Example: `lichess,professional-frisian-players,6Xh2zNLA`
+                    Example: `lichess,professional-frisian-players,wfd`
                 nbLeaders:
                   type: integer
                   description: Number team leaders per team.
@@ -1354,7 +1378,7 @@ paths:
       operationId: gamesByTournament
       summary: Export games of an Arena tournament
       description: |
-        Download games of a tournament in PDN or [ndjson](http://ndjson.org/) format.
+        Download games of a tournament in PDN or [ndjson](#section/Introduction/Streaming-with-ND-JSON) format, depending on the request Accept header.
 
         Games are sorted by reverse chronological order (most recent first)
       tags:
@@ -1433,7 +1457,7 @@ paths:
       description: |
         Players of an Arena tournament, with their score and performance, sorted by rank (best first).
 
-        **Players are streamed as [ndjson](http://ndjson.org/)**, i.e. one JSON object per line.
+        **Players are streamed as [ndjson](#section/Introduction/Streaming-with-ND-JSON)**, i.e. one JSON object per line.
 
         If called on an ongoing tournament, results can be inconsistent
         due to ranking changes while the players are being streamed.
@@ -1495,7 +1519,7 @@ paths:
 
         Tournaments are sorted by reverse chronological order of start date (last starting first).
 
-        **Tournaments are streamed as [ndjson](http://ndjson.org/)**, i.e. one JSON object per line.
+        Tournaments are streamed as [ndjson](#section/Introduction/Streaming-with-ND-JSON).
       tags:
         - "Arena tournaments"
       security:
@@ -1592,7 +1616,7 @@ paths:
       operationId: gamesBySimul
       summary: Export games of a simul
       description: |
-        Download games of a simul in PDN or [ndjson](http://ndjson.org/) format.
+        Download games of a simul in PDN or [ndjson](#section/Introduction/Streaming-with-ND-JSON) format, depending on the request Accept header.
       tags:
         - Simuls
       security:
@@ -2047,7 +2071,7 @@ paths:
       operationId: apiUserFollowing
       summary: Get users followed by a user
       description: |
-        **Users are streamed as [ndjson](http://ndjson.org/)**, i.e. one JSON object per line.
+        Users are streamed as [ndjson](#section/Introduction/Streaming-with-ND-JSON).
       tags:
         - Relations
       security:
@@ -2071,7 +2095,7 @@ paths:
       operationId: apiUserFollowers
       summary: Get users who follow a user
       description: |
-        **Users are streamed as [ndjson](http://ndjson.org/)**, i.e. one JSON object per line.
+        Users are streamed as [ndjson](#section/Introduction/Streaming-with-ND-JSON).
       tags:
         - Relations
       security:
@@ -2095,7 +2119,7 @@ paths:
       operationId: apiStreamEvent
       summary: Stream incoming events
       description: "\n
-      \ Stream the events reaching a lidraughts user in real time as [ndjson](http://ndjson.org/).\n\n
+      \ Stream the events reaching a lidraughts user in real time as [ndjson](#section/Introduction/Streaming-with-ND-JSON).\n\n
       \ Each line is a JSON object containing a `type` field. Possible values are:\n
       \ - `gameStart` Start of a game\n
       \ - `challenge` A player sends you a challenge\n
@@ -2146,7 +2170,7 @@ paths:
       operationId: botGameStream
       summary: Stream Bot game state
       description: "\
-      \ Stream the state of a game being played with the Bot API, as [ndjson](http://ndjson.org/).\n\
+      \ Stream the state of a game being played with the Bot API, as [ndjson](#section/Introduction/Streaming-with-ND-JSON).\n\
       \nUse this endpoint to get updates about the game in real-time, with a single request.\n\
       \nEach line is a JSON object containing a `type` field. Possible values are:\n
       \ - `gameFull` Full game data. All values are immutable, except for the `state` field.\n
