@@ -6,7 +6,7 @@ info:
     url: https://lidraughts.org/assets/piece/king-logo.svg
     backgroundColor: #ffffff
   description: "\n\n# Introduction\nWelcome to the reference for the Lidraughts API! Lidraughts is free/libre, open-source draughts server powered by volunteers and donations.\n\n\
-  \ - Get help in the [lidraughts developers discord channel](https://discord.gg/9CPhTJQEra).\n\
+  \ - Get help by email at [contact@lidraughts.org](mailto:contact@lidraughts.org).\n\
   \ - [Contribute to this documentation on Github](https://github.com/roepstoep/lidraughts-api).\n\
   \ - Check out [lidraughts widgets to embed in your website](https://lidraughts.org/developers).\n\
   \n## Endpoint\n\
@@ -868,6 +868,10 @@ paths:
         You can create up to 12 public tournaments per day, or 24 private tournaments.
 
         A team battle can be created by specifying the `teambBattleByTeam` argument.
+
+        Additional restrictions:
+          - clockTime + clockIncrement > 0
+          - Clock time in comparison to tournament length must be reasonable: 3 <= (minutes * 60) / (96 * clockTime + 48 * clockIncrement + 15) <= 150
       tags:
         - "Arena tournaments"
       security:
@@ -986,7 +990,7 @@ paths:
                     - 60
                 startDate:
                   type: integer
-                  description: Timestamp to start the tournament at a given date and time. Overrides the `waitMinutes` setting.
+                  description: Timestamp (in milliseconds) to start the tournament at a given date and time. Overrides the `waitMinutes` setting.
                 variant:
                   type: string
                   description: The variant to use in tournament games
@@ -1009,7 +1013,11 @@ paths:
                   default: true
                 streakable:
                   type: boolean
-                  description: After 2 wins, consecutive wins grant 4 points instead of 2.
+                  description: After 2 wins, consecutive wins grant 4 points instead of 2
+                  default: true
+                hasChat:
+                  type: boolean
+                  description: Whether the players can discuss in a chat
                   default: true
                 description:
                   type: string
@@ -1035,12 +1043,15 @@ paths:
                 conditions.minRating.rating:
                   type: integer
                   description: Minimum rating to join. Leave empty to let everyone join the tournament.
+                  enum: [1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500, 2600]
                 conditions.maxRating.rating:
                   type: integer
                   description: Maximum rating to join. Based on best rating reached in the last 7 days. Leave empty to let everyone join the tournament.
+                  enum: [2200, 2100, 2000, 1900, 1800, 1700, 1600, 1500, 1400, 1300, 1200, 1000]
                 conditions.nbRatedGame.nb:
                   type: integer
                   description: Minimum number of rated games required to join.
+                  enum: [0, 5, 10, 15, 20, 30, 40, 50, 75, 100, 150, 200]
               required:
                 - clockTime
                 - clockIncrement
@@ -1058,6 +1069,13 @@ paths:
                 $ref: '#/components/schemas/Error'
 
   /api/tournament/{id}:
+    parameters:
+     - in: path
+       name: id
+       description: The tournament ID.
+       schema:
+         type: string
+       required: true
     get:
       operationId: tournament
       summary: Get info about an Arena tournament
@@ -1065,15 +1083,8 @@ paths:
         Get detailed info about recently finished, current, or upcoming tournament's duels, player standings, and other info.
       tags:
         - "Arena tournaments"
-      security:
-        - None: []
+      security: []
       parameters:
-        - in: path
-          name: id
-          description: The tournament ID.
-          schema:
-            type: string
-          required: true
         - in: query
           name: page
           description: Specify which page of player standings to view.
@@ -1085,67 +1096,258 @@ paths:
             maximum: 200
       responses:
         200:
+          description: The information of the Arena tournament.
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                default: "'*'"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArenaTournament'
+    post:
+      operationId: apiTournamentUpdate
+      summary: Update an Arena tournament
+      description: |
+        Update an Arena tournament.
+
+        Ongoing tournaments can no longer be updated.
+
+        Can be used to update a team battle.
+
+        Additional restrictions:
+          - clockTime + clockIncrement > 0
+          - Clock time in comparison to tournament length must be reasonable: 3 <= (minutes * 60) / (96 * clockTime + 48 * clockIncrement + 15) <= 150
+      tags:
+        - "Arena tournaments"
+      security:
+        - OAuth2: ["tournament:write"]
+      requestBody:
+        description: Parameters of the tournament
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The tournament name. Leave empty to get a random Grandmaster name
+                  minLength: 2
+                  maxLength: 30
+                clockTime:
+                  type: number
+                  description: Clock initial time in minutes
+                  example: 2
+                  enum:
+                    - 0
+                    - 0.25
+                    - 0.5
+                    - 0.75
+                    - 1
+                    - 1.5
+                    - 2
+                    - 3
+                    - 4
+                    - 5
+                    - 6
+                    - 7
+                    - 8
+                    - 10
+                    - 15
+                    - 20
+                    - 25
+                    - 30
+                    - 40
+                    - 50
+                    - 60
+                clockIncrement:
+                  type: integer
+                  description: Clock increment in seconds
+                  example: 1
+                  enum: [0, 1, 2, 3, 4, 5, 6, 7, 10, 15, 20, 25, 30, 40, 50, 60]
+                minutes:
+                  type: integer
+                  description: How long the tournament lasts, in minutes
+                  example: 60
+                  enum: [20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80, 90, 100, 110, 120, 150, 180, 210, 240, 270, 300, 330, 360]
+                waitMinutes:
+                  type: integer
+                  description: How long to wait before starting the tournament, from now, in minutes
+                  default: 5
+                  enum: [1, 2, 3, 5, 10, 15, 20, 30, 45, 60]
+                startDate:
+                  type: integer
+                  description: Timestamp (in milliseconds) to start the tournament at a given date and time. Overrides the `waitMinutes` setting
+                variant:
+                  type: string
+                  description: The variant to use in tournament games
+                  enum:
+                    - standard
+                    - frisian
+                    - frysk
+                    - antidraughts
+                    - breakthrough
+                    - russian
+                    - brazilian
+                  default: standard
+                rated:
+                  type: boolean
+                  description: Games are rated and impact players ratings
+                  default: true
+                berserkable:
+                  type: boolean
+                  description: Whether the players can use berserk.
+                  default: true
+                streakable:
+                  type: boolean
+                  description: After 2 wins, consecutive wins grant 4 points instead of 2
+                  default: true
+                hasChat:
+                  type: boolean
+                  description: Whether the players can discuss in a chat
+                  default: true
+                description:
+                  type: string
+                  description: Anything you want to tell players about the tournament
+                password:
+                  type: string
+                  description: Make the tournament private, and restrict access with a password
+                conditions.teamMember.teamId:
+                  type: string
+                  description: |
+                    Restrict entry to members of a team.
+
+                    The teamId is the last part of a team URL, e.g. https://lidraughts.org/team/lichess has teamId = `lichess`.
+                conditions.minRating.rating:
+                  type: integer
+                  description: Minimum rating to join. Leave empty to let everyone join the tournament.
+                  enum: [1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500, 2600]
+                conditions.maxRating.rating:
+                  type: integer
+                  description: Maximum rating to join. Based on best rating reached in the last 7 days. Leave empty to let everyone join the tournament.
+                  enum: [2200, 2100, 2000, 1900, 1800, 1700, 1600, 1500, 1400, 1300, 1200, 1000]
+                conditions.nbRatedGame.nb:
+                  type: integer
+                  description: Minimum number of rated games required to join.
+                  enum: [0, 5, 10, 15, 20, 30, 40, 50, 75, 100, 150, 200]
+              required:
+                - clockTime
+                - clockIncrement
+                - minutes
+      responses:
+        "200":
+          description: The Arena tournament was successfully updated.
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                default: "'*'"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArenaTournament'
+        "400":
+          description: The update of the Arena tournament failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/tournament/{id}/terminate:
+    post:
+      operationId: apiTournamentTerminate
+      summary: Terminate an Arena tournament
+      description: |
+        Terminate an Arena tournament
+      tags:
+        - "Arena tournaments"
+      security:
+        - OAuth2: ["tournament:write"]
+      parameters:
+        - in: path
+          name: id
+          description: The tournament ID.
+          schema:
+            type: string
+            example: "hL7vMrFQ"
+          required: true
+      responses:
+        "200":
+          description: The tournament was successfully terminated.
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                default: "'*'"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+        "400":
+          description: Terminating the tournament failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /api/tournament/team-battle/{id}:
-      post:
-        operationId: apiTournamentTeamBattlePost
-        summary: Update a team battle
-        description: |
-          Set the teams and number of leaders of a team battle.
-          To update the other attributes of a team battle, use the [tournament update endpoint](#operation/apiTournamentUpdate).
-        tags:
-          - "Arena tournaments"
-        security:
-          - OAuth2: ["tournament:write"]
-        parameters:
-          - in: path
-            name: id
-            description: The tournament ID (8 characters)..
-            required: true
-            schema:
-              type: string
-        requestBody:
+    post:
+      operationId: apiTournamentTeamBattlePost
+      summary: Update a team battle
+      description: |
+        Set the teams and number of leaders of a team battle.
+        To update the other attributes of a team battle, use the [tournament update endpoint](#operation/apiTournamentUpdate).
+      tags:
+        - "Arena tournaments"
+      security:
+        - OAuth2: ["tournament:write"]
+      parameters:
+        - in: path
+          name: id
+          description: The tournament ID (8 characters)..
           required: true
-          content:
-            application/x-www-form-urlencoded:
-              schema:
-                type: object
-                properties:
-                  teams:
-                    type: string
-                    description: |
-                      All team IDs of the team battle, separated by commas.
-                      Make sure to always send the full list.
-                      Teams that are not in the list will be removed from the team battle.
-                      Example: `lichess,professional-frisian-players,6Xh2zNLA`
-                  nbLeaders:
-                    type: integer
-                    description: Number team leaders per team.
-                required:
-                  - teams
-                  - nbLeaders
-        responses:
-          200:
-            description: The team battle tournament was successfully updated.
-            headers:
-              Access-Control-Allow-Origin:
-                schema:
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                teams:
                   type: string
-                  default: "'*'"
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/ArenaTournament'
-          400:
-            description: The update of the team battle tournament failed.
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
+                  description: |
+                    All team IDs of the team battle, separated by commas.
+                    Make sure to always send the full list.
+                    Teams that are not in the list will be removed from the team battle.
+                    Example: `lichess,professional-frisian-players,6Xh2zNLA`
+                nbLeaders:
+                  type: integer
+                  description: Number team leaders per team.
+              required:
+                - teams
+                - nbLeaders
+      responses:
+        200:
+          description: The team battle tournament was successfully updated.
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                default: "'*'"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArenaTournament'
+        400:
+          description: The update of the team battle tournament failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /api/tournament/{id}/games:
     get:
