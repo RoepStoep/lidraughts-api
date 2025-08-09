@@ -1564,7 +1564,7 @@ paths:
       responses:
         200:
           content:
-            application/x-draughts-pdn:
+            application/json:
               schema:
                 $ref: '#/components/schemas/StudyPdn'
 
@@ -1588,7 +1588,7 @@ paths:
       responses:
         200:
           content:
-            application/x-draughts-pdn:
+            application/json:
               schema:
                 $ref: '#/components/schemas/StudyPdn'
 
@@ -2898,11 +2898,11 @@ components:
           ],
           [
             "Event",
-            "Dutch Championship Rapid 2020 - Round 1"
+            "Dutch Championship Rapid 2020"
           ],
           [
             "Round",
-            "-"
+            "1"
           ]
         ]
       }
