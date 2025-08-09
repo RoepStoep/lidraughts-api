@@ -1570,7 +1570,7 @@ paths:
 
   /study/{studyId}.pdn:
     get:
-      operationId: studyChapterPdn
+      operationId: studyPdn
       summary: Export all chapters
       description: |
         Download all chapters of a study in PDN format.
@@ -1591,6 +1591,30 @@ paths:
             application/x-draughts-pdn:
               schema:
                 $ref: '#/components/schemas/StudyPdn'
+
+  /study/{studyId}/chapter:
+    get:
+      operationId: studyCurrentChapter
+      summary: Get active chapter of a study
+      description: |
+        Get the currently active chapter of a study. Note that Sync must be enabled in the study settings.
+      tags:
+        - Studies
+      security:
+        - SameOrigin: []
+      parameters:
+        - in: path
+          name: studyId
+          description: The study ID (8 characters).
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/x-draughts-pdn:
+              schema:
+                $ref: '#/components/schemas/CurrentChapter'
 
   /api/simul:
     get:
@@ -2823,6 +2847,7 @@ components:
         [Termination "Normal"]
 
         1. 32-28 {[%clock w0:05:00 B0:05:00]} 18-23 {[%clock W0:05:00 b0:05:00]} 2. 34-29 {[%clock w0:04:58 B0:05:00]} 23x34 {[%clock W0:04:58 b0:04:58]} 3. 40x29 {[%clock w0:04:57 B0:04:58]} 12-18 {[%clock W0:04:57 b0:04:55]} 4. 44-40 {[%clock w0:04:56 B0:04:55]} 7-12 {[%clock W0:04:56 b0:04:54]} 5. 50-44 {[%clock w0:04:56 B0:04:54]} 1-7 {[%clock W0:04:56 b0:04:52]} 6. 37-32 {[%clock w0:04:55 B0:04:52]} 17-22 {[%clock W0:04:55 b0:04:50]} 7. 28x17 {[%clock w0:04:54 B0:04:50]} 11x22 {[%clock W0:04:54 b0:04:49]} 8. 41-37 {[%clock w0:04:54 B0:04:49]} 7-11 {[%clock W0:04:54 b0:04:46]} 9. 46-41 {[%clock w0:04:53 B0:04:46]} 20-25 {[%clock W0:04:53 b0:04:42]} 10. 31-26 {[%clock w0:04:51 B0:04:42]} 19-23 {[%clock W0:04:51 b0:04:27]} 11. 37-31 {[%clock w0:04:46 B0:04:27]} 23x34 {[%clock W0:04:46 b0:04:20]} 12. 40x29 {[%clock w0:04:46 B0:04:20]} 14-19 {[%clock W0:04:46 b0:04:18]} 13. 32-27 {[%clock w0:04:31 B0:04:18]} 10-14 {[%clock W0:04:31 b0:03:55]} 14. 41-37 {[%clock w0:04:15 B0:03:55]} 5-10 {[%clock W0:04:15 b0:03:47]} 15. 44-40 {[%clock w0:04:10 B0:03:47]} 14-20 {[%clock W0:04:10 b0:03:46]} 16. 29-24 {[%clock w0:03:50 B0:03:46]} 20x29 {[%clock W0:03:50 b0:03:23]} 17. 33x24 {[%clock w0:03:49 B0:03:23]} 19x30 {[%clock W0:03:49 b0:03:21]} 18. 35x24 {[%clock w0:03:49 B0:03:21]} 10-14 {[%clock W0:03:49 b0:03:20]} 19. 38-33 {[%clock w0:03:43 B0:03:20]} 14-20 {[%clock W0:03:43 b0:03:17]} 20. 43-38 {[%clock w0:03:32 B0:03:17]} 20x29 {[%clock W0:03:32 b0:03:14]} 21. 33x24 {[%clock w0:03:32 B0:03:14]} 9-14 {[%clock W0:03:32 b0:03:12]} 22. 39-33 {[%clock w0:03:27 B0:03:12]} 4-9 {[%clock W0:03:27 b0:03:08]} 23. 40-34 {[%clock w0:03:03 B0:03:08]} 14-19 {[%clock W0:03:03 b0:03:06]} 24. 34-29 {[%clock w0:02:57 B0:03:06]} 19x30 {[%clock W0:02:57 b0:03:04]} 25. 29-23 {[%clock w0:02:57 B0:03:04]} 18x29 {[%clock W0:02:57 b0:02:36]} 26. 27x7 {[%clock w0:02:41 B0:02:36]} 8-12 {[%clock W0:02:41 b0:02:31]} 27. 33x35 {[%clock w0:02:39 B0:02:31]} 2-0
+
     StudyPdn:
       example: |
         [Event "Draughts Openings 🎓✅: Chefneux Opening"]
@@ -2836,6 +2861,51 @@ components:
 
         { [%csl R28,G23][%cal R3228,G1823] }
         1. 32-28 {[%csl R28,G23][%cal R3228,G1823]} 1... 18-23 {[%csl G23,R28][%cal G1823,R3228]} 2. 38-32 (2. 33-29 23x32 3. 37x28)  (2. 37-32?? {[%csl R37]} 2... 23-29!! {This is the infamous Harlem Shot of the Chefneux Opening, probably the oldest "trap" in all of draughts. White continued developing its left-wing but left a hole that can be inmediately exploited by the following combination:} {[%csl R37]} 3. 34x23 {[%csl R37,R26]} (3. 33x24 {[%csl R37]} 3... 20x29 {[%csl R26,R37]} 4. 34x23 $7 {[%csl R26,R37]} 4... 17-22 {[%csl R26,R37]} 5. 28x17 $7 {[%csl R28,R37,R26][%cal R1928,R2837,R3726]} 5... 19x26 {[%csl R28,R37,R26][%cal R1928,R2837,R3726]}) 3... 17-22 {[%csl R37,R26]} 4. 28x17 $7 {[%csl R28,R37,R26][%cal R1928,R2837,R3726]} 4... 19x26 $17) 2... 12-18 *
+
+    CurrentChapter:
+      example: {
+        "studyId": "cqTF5Nc2",
+        "chapterId": "pw60w1uP",
+        "name": "Kees Thijssen - Jan Groenendijk",
+        "tags": [
+          [
+            "White",
+            "Kees Thijssen"
+          ],
+          [
+            "Black",
+            "Jan Groenendijk"
+          ],
+          [
+            "TimeControl",
+            "900+10"
+          ],
+          [
+            "Date",
+            "2020.07.24"
+          ],
+          [
+            "Result",
+            "0-2"
+          ],
+          [
+            "Termination",
+            "Time forfeit"
+          ],
+          [
+            "Site",
+            "https://lidraughts.org/CmtutpNe"
+          ],
+          [
+            "Event",
+            "Dutch Championship Rapid 2020 - Round 1"
+          ],
+          [
+            "Round",
+            "-"
+          ]
+        ]
+      }
 
     Title:
       type: string
